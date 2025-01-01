@@ -11,6 +11,29 @@ from constructs import Construct
 
 
 class LambdaHostedStack(Stack):
+    '''
+    LambdaHostedStack defines resources required for hosting a pretrained ML model in AWS Lambda, served through API Gateway.
+    Required input on instantiation:
+        - pge_stack -> main stack which hosts shared resources
+
+    Two shared resources from argument pge_stack are used here:
+        - s3_model_storage_bucket -> storage resource for pretrained ML model
+        - secret_api_key -> secret key used to generate temporary access keys for API
+
+    Lambda hosted application resources defined here are as follows:
+        - Lambda function "authentication-lambda" to validate username & password, returns generate JWT access key
+        - Lambda function "model_serve_lambda" that takes a numeric value as input, and returns prediction based off input (when JWT access key is valid).
+        - API Gateway to front lambda hosted ML inference application.
+        - API Gateway route /login with method POST to provide interface for authentication_lambda
+        - API Gateway route /predict with method GET to provide interface for model_serve_lambda
+        - Events timer to keep lambda functions warm (prevents inevitable timeout when assessor sends request)
+
+    Three resources are provided as output here to be passed to monitoring stack:
+        - model_serve_lambda
+        - authentication_lambda
+        - model_api
+    '''
+
     def __init__(
         self, scope: Construct, construct_id: str, pge_stack: Construct, **kwargs
     ) -> None:
