@@ -8,6 +8,29 @@ from constructs import Construct
 
 
 class EcsHostedStack(Stack):
+    '''
+    EcsHostedStack defines resources required for hosting a pretrained ML model in AWS ECS, served through an Application Load Balancer.
+    Required input on instantiation:
+        - pge_stack -> main stack which hosts shared resources
+
+    Two shared resources from argument pge_stack are used here:
+        - s3_model_storage_bucket -> storage resource for pretrained ML model
+        - secret_api_key -> secret key used to generate temporary access keys for API
+
+    ECS hosted application resources defined here are as follows:
+        - ECS Cluster to host our service
+        - ECS Task to define container and configuration
+        - ECS Service to associate cluster, task, and define capacity provider (Fargate Spot)
+        - Container image defining our Flask app
+        - VPC to define network ecosystem for ECS and ALB to run in.
+        - VPC Endpoints to allow services in private subnet to communicate directly with s3 and Secrets Manager (not over public internet)
+        - Autoscling group to support service autoscaling.
+        - Application Load Balancer to distribute traffic across targets in autoscaling group.
+
+    Two resources are provided as output here to be passed to monitoring stack:
+        - ecs_serve_service
+        - ecs_serve_alb
+    '''
     def __init__(
         self, scope: Construct, construct_id: str, pge_stack: Construct, **kwargs
     ) -> None:

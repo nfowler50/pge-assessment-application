@@ -6,6 +6,25 @@ from aws_cdk import (
 from constructs import Construct
 
 class EcsMonitoringStack(Stack):
+    '''
+    EcsMonitoringStack defines metrics, alarms, and a dashborad for the ECS hosted application.
+    Required input on instantiation:
+        - ecs_stack -> stack defining resources for ECS hosted application
+
+    Two resources from argument ecs_stack are used here:
+        - ecs_serve_service -> compute resource for hosting Flask application
+        - ecs_serve_alb -> interface used for ECS hosted applikcation and load distributer
+
+    Lambda monitoring resources defined here are as follows:
+        - CPU utilization metric and alarm for ecs_serve_service
+        - Memory utilization metric and alarm for ecs_serve_service
+        - Error metric and alarm for ALB 4xx returns
+        - Error metric and alarm for ALB 5xx returns
+        - Latency metric and alarm for ALB returns
+        - Metric dashboard used to monitor resources supporting ECS hosted ML inference application
+
+    No resources are provided as output.
+    '''
     def __init__(
         self, scope: Construct, construct_id: str, ecs_stack: Construct, **kwargs
     ) -> None:
