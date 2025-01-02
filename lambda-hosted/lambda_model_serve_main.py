@@ -11,6 +11,7 @@ logger.setLevel(logging.INFO)
 authenticator = AuthVerifier()
 model = lrmh(logger)
 
+
 def authenticate_request(event):
     """
     Extract and validate the JWT token from the Authorization header.
@@ -23,12 +24,13 @@ def authenticate_request(event):
     Raises:
         ValueError: If authentication fails.
     """
-    auth_header = event['headers'].get('Authorization', '')
+    auth_header = event["headers"].get("Authorization", "")
     if not auth_header.startswith("Bearer "):
         raise ValueError("Missing or invalid Authorization header")
 
     token = auth_header.split(" ")[1]
     return authenticator.validate_jwt(token)
+
 
 def make_prediction(decoded_token, event):
     """
@@ -45,7 +47,9 @@ def make_prediction(decoded_token, event):
     if model.model is None:
         return {
             "statusCode": 503,  # Service Unavailable
-            "body": json.dumps({"error": "Model is not available. Initialization failed."}),
+            "body": json.dumps(
+                {"error": "Model is not available. Initialization failed."}
+            ),
         }
 
     # Get input from query parameters
@@ -75,6 +79,7 @@ def make_prediction(decoded_token, event):
             "body": json.dumps({"error": "An unexpected error occurred."}),
         }
 
+
 def handler(event, context):
     """
     AWS Lambda entry point.
@@ -87,16 +92,13 @@ def handler(event, context):
         dict: Response object for the Lambda function.
     """
     # Check if the event is the keep-warm event
-    if 'KeepWarmRule' in event.get('detail-type', ''):
+    if "KeepWarmRule" in event.get("detail-type", ""):
         # Log it as an info-level event
         logger.info("Keep warm ping received; this is not an error.")
-        
+
         # You can either return immediately or perform a lightweight action
-        return {
-            'statusCode': 200,
-            'body': "Keep warm ping successful"
-        }
-    
+        return {"statusCode": 200, "body": "Keep warm ping successful"}
+
     try:
         # Authenticate request
         decoded_token = authenticate_request(event)

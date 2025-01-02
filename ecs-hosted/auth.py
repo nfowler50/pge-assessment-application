@@ -1,9 +1,6 @@
 import boto3
-import json
-import logging
 import os
-from jose import jwt, JWTError
-from datetime import timezone
+import logging
 
 
 class AuthVerifier:
@@ -33,12 +30,3 @@ class AuthVerifier:
         except Exception as e:
             self.logger.error(f"Error fetching secret: {e}")
             raise e
-
-    def validate_jwt(self, token):
-        """Validate the provided JWT."""
-        try:
-            decoded_token = jwt.decode(token, self.secret, algorithms=["HS256"])
-            return decoded_token  # Returns the token payload if valid
-        except JWTError as e:
-            self.logger.warning(f"JWT validation failed: {e}")
-            raise ValueError("Invalid token")

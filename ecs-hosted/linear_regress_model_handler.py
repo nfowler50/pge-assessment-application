@@ -64,7 +64,7 @@ class LinearRegressModelHandler:
         except ValueError:
             return False
 
-    def predict(self, input_data: float) -> list:
+    def predict(self, input_data) -> list:
         if not self.model:
             raise ValueError("Model is not loaded. Unable to perform predictions.")
 

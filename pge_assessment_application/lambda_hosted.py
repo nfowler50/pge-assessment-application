@@ -11,13 +11,36 @@ from constructs import Construct
 
 
 class LambdaHostedStack(Stack):
+    """
+    LambdaHostedStack defines resources required for hosting a pretrained ML model in AWS Lambda, served through API Gateway.
+    Required input on instantiation:
+        - pge_stack -> main stack which hosts shared resources
+
+    Two shared resources from argument pge_stack are used here:
+        - s3_model_storage_bucket -> storage resource for pretrained ML model
+        - secret_api_key -> secret key used to generate temporary access keys for API
+
+    Lambda hosted application resources defined here are as follows:
+        - Lambda function "authentication-lambda" to validate username & password, returns generate JWT access key
+        - Lambda function "model_serve_lambda" that takes a numeric value as input, and returns prediction based off input (when JWT access key is valid).
+        - API Gateway to front lambda hosted ML inference application.
+        - API Gateway route /login with method POST to provide interface for authentication_lambda
+        - API Gateway route /predict with method GET to provide interface for model_serve_lambda
+        - Events timer to keep lambda functions warm (prevents inevitable timeout when assessor sends request)
+
+    Three resources are provided as output here to be passed to monitoring stack:
+        - model_serve_lambda
+        - authentication_lambda
+        - model_api
+    """
+
     def __init__(
         self, scope: Construct, construct_id: str, pge_stack: Construct, **kwargs
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # import from main stack
-        s3_model_storage_bucket=pge_stack.s3_model_storage_bucket
+        s3_model_storage_bucket = pge_stack.s3_model_storage_bucket
         secret_api_key = pge_stack.secret_api_key
 
         # Get deployment environment name (SANDBOX / BETA / PROD)
@@ -65,9 +88,7 @@ class LambdaHostedStack(Stack):
         model_serve_lambda.add_environment(
             "SECRET_API_KEY", secret_api_key.secret_full_arn
         )
-        model_serve_lambda.add_environment(
-            "FLASK_ENV", environment
-        )
+        model_serve_lambda.add_environment("FLASK_ENV", environment)
         authentication_lambda.add_environment(
             "SECRET_API_KEY", secret_api_key.secret_full_arn
         )
@@ -129,9 +150,7 @@ class LambdaHostedStack(Stack):
         login_method = login_resource.add_method(
             "POST",
             login_integration,
-            request_parameters={
-                "method.request.header.Authorization": False
-            },
+            request_parameters={"method.request.header.Authorization": False},
         )
 
         # Add keep warm timer to Lambdas - this prevents request timeouts
@@ -139,7 +158,9 @@ class LambdaHostedStack(Stack):
         event_rule = aws_events.Rule(
             self,
             "Every5MinutesRule",
-            schedule=aws_events.Schedule.expression("rate(5 minutes)")  # Trigger every 5 minutes
+            schedule=aws_events.Schedule.expression(
+                "rate(5 minutes)"
+            ),  # Trigger every 5 minutes
         )
 
         # Add the Lambda functions as the targets of the CloudWatch Event rule
@@ -147,11 +168,14 @@ class LambdaHostedStack(Stack):
         event_rule.add_target(aws_events_targets.LambdaFunction(authentication_lambda))
 
         # Grant CloudWatch permission to invoke the Lambda function
-        model_serve_lambda.grant_invoke(aws_iam.ServicePrincipal("events.amazonaws.com"))
-        authentication_lambda.grant_invoke(aws_iam.ServicePrincipal("events.amazonaws.com"))
-
+        model_serve_lambda.grant_invoke(
+            aws_iam.ServicePrincipal("events.amazonaws.com")
+        )
+        authentication_lambda.grant_invoke(
+            aws_iam.ServicePrincipal("events.amazonaws.com")
+        )
 
         # **** 4. Output relevant details ****
-        self.model_serve_lambda=model_serve_lambda
+        self.model_serve_lambda = model_serve_lambda
         self.authentication_lambda = authentication_lambda
-        self.model_api=model_api
+        self.model_api = model_api

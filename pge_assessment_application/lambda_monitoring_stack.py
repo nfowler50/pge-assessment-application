@@ -6,6 +6,27 @@ from constructs import Construct
 
 
 class LambdaMonitoringStack(Stack):
+    """
+    LambdaMonitoringStack defines metrics, alarms, and a dashborad for the lambda hosted application.
+    Required input on instantiation:
+        - lambda_stack -> stack defining resources for lambda hosted application
+
+    Three resources from argument lambda_stack are used here:
+        - model_serve_lambda -> compute resource for processing inputs and returning predictions
+        - authentication_lambda -> compute resource used to validate username password and generate JWT access key
+        - model_api -> interface used for lambda hosted ML inference application
+
+    Lambda monitoring resources defined here are as follows:
+        - Error metric and alarm for model_serve_lambda
+        - Error metric and alarm for authentication_lambda
+        - Error metric and alarm for API 4xx status code returns
+        - Error metric and alarm for API 5xx status code returns
+        - API latency metric and alarm
+        - Metric dashboard used to monitor resources supporting lambda hosted ML inference application
+
+    No resources are provided as output.
+    """
+
     def __init__(
         self, scope: Construct, construct_id: str, lambda_stack: Construct, **kwargs
     ) -> None:
