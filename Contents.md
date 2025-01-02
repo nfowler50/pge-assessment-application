@@ -1,4 +1,18 @@
 
+Navigating the repository:
+    • /app.py: this script defines and orchestrates high level stack to be deployed.
+      
+    • /pge_app_infrastructure: this directory contains all substack IaC definitions.
+    • /pge_app_infrastructure/pge_stack.py: defines shared resources for entire stack.
+    • /pge_app_infrastructure/ecs_hosted.py: defines application hosted in ECS through Application Load Balancer.
+    • /pge_app_infrastructure/ecs_monitoring_stack.py: defines metrics, alarms, and dashboards for ECS hosted application.
+    • /pge_app_infrastructure/lambda_hosted.py: defines application hosted in Lambda through API Gateway.
+    • /pge_app_infrastructure/lambda_monitoring_stack.py: defines metrics, alarms, and dashboards for lambda hosted application.
+
+    • /ecs-hosted: Dockerfile and Python scripts for ECS container supporting login and predict methods.
+    • /lambda-auth: Dockerfile and Python scripts for Lambda used for login method.
+    • /lambda-hosted: Dockerfile and Python scripts for Lambda used for predict method.
+    • /model: Python scripts and data used to generate pretrained model
 # Welcome to your CDK Python project!
 
 This is a blank project for CDK development with Python.
