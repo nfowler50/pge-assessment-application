@@ -2,7 +2,8 @@ from aws_cdk import (
     Stack,
     aws_ec2,
     aws_ecs,
-    aws_elasticloadbalancingv2
+    aws_elasticloadbalancingv2,
+    CfnOutput
 )
 from constructs import Construct
 
@@ -67,7 +68,7 @@ class EcsHostedStack(Stack):
         ## Note: Deploying container from local asset still leverages ECR but abstracts this layer away.
         ## By abstracting the ECR layer away, we reduce number of resources to manage, and we eliminate the
         ## issue of existing resources leveraging outdated code or needing a force update. This also allows
-        ## us to consolidate version control.
+        ## us to consolidate version control. Version control still available through Git.
         ecs_serve_container_image = aws_ecs.ContainerImage.from_asset("./ecs-hosted/")
         ecs_serve_container = ecs_serve_task_definition.add_container(
             "{}-ECS-Serve-Container".format(environment),
@@ -163,3 +164,12 @@ class EcsHostedStack(Stack):
         # **** 4. Output relevant details ****
         self.ecs_serve_service = ecs_serve_service
         self.ecs_serve_alb = ecs_serve_alb
+        self.ecs_serve_alb_dns = ecs_serve_alb.load_balancer_dns_name
+
+        # Add the ALB URL to the stack outputs
+        CfnOutput(
+            self,
+            "{}-EcsServeAlbUrl".format(environment),
+            value=f"http://{ecs_serve_alb.load_balancer_dns_name}",
+            description="URL of the ECS Serve ALB",
+        )
