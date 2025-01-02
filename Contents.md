@@ -1,5 +1,5 @@
 
-Navigating the repository:
+# Navigating the repository:
     • /app.py: this script defines and orchestrates high level stack to be deployed.
       
     • /pge_app_infrastructure: this directory contains all substack IaC definitions.
