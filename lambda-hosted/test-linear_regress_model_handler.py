@@ -63,7 +63,9 @@ def test_predict_invalid_input(handler):
 def test_predict_model_not_loaded():
     # Test if prediction raises error when model is not loaded
     handler = LinearRegressModelHandler(logger=None)
-    with pytest.raises(ValueError, match="Model is not loaded. Unable to perform predictions."):
+    with pytest.raises(
+        ValueError, match="Model is not loaded. Unable to perform predictions."
+    ):
         handler.predict(3.0)
 
 

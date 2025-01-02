@@ -1,12 +1,9 @@
-from aws_cdk import (
-    Stack,
-    aws_cloudwatch,
-    aws_elasticloadbalancingv2
-)
+from aws_cdk import Stack, aws_cloudwatch, aws_elasticloadbalancingv2
 from constructs import Construct
 
+
 class EcsMonitoringStack(Stack):
-    '''
+    """
     EcsMonitoringStack defines metrics, alarms, and a dashborad for the ECS hosted application.
     Required input on instantiation:
         - ecs_stack -> stack defining resources for ECS hosted application
@@ -24,7 +21,8 @@ class EcsMonitoringStack(Stack):
         - Metric dashboard used to monitor resources supporting ECS hosted ML inference application
 
     No resources are provided as output.
-    '''
+    """
+
     def __init__(
         self, scope: Construct, construct_id: str, ecs_stack: Construct, **kwargs
     ) -> None:
@@ -69,8 +67,8 @@ class EcsMonitoringStack(Stack):
         # ***** 2. CloudWatch Alarms for ALB *****
         # Monitor ALB 5xx Errors
         alb_5xx_metric = ecs_alb.metrics.http_code_target(
-            code=aws_elasticloadbalancingv2.HttpCodeTarget.TARGET_5XX_COUNT, 
-            statistic="Sum"
+            code=aws_elasticloadbalancingv2.HttpCodeTarget.TARGET_5XX_COUNT,
+            statistic="Sum",
         )
         alb_5xx_alarm = aws_cloudwatch.Alarm(
             self,
@@ -84,8 +82,8 @@ class EcsMonitoringStack(Stack):
         )
         # Monitor 4xx auth failures
         alb_4xx_metric = ecs_alb.metrics.http_code_target(
-            code=aws_elasticloadbalancingv2.HttpCodeTarget.TARGET_4XX_COUNT, 
-            statistic="Sum"
+            code=aws_elasticloadbalancingv2.HttpCodeTarget.TARGET_4XX_COUNT,
+            statistic="Sum",
         )
         alb_4xx_alarm = aws_cloudwatch.Alarm(
             self,

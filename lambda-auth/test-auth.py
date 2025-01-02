@@ -13,7 +13,9 @@ def mock_aws_secret_manager():
         mock_boto_client.return_value = mock_secrets_client
 
         # Mock the response for get_secret_value
-        mock_secrets_client.get_secret_value.return_value = {"SecretString": "mock-secret"}
+        mock_secrets_client.get_secret_value.return_value = {
+            "SecretString": "mock-secret"
+        }
 
         yield mock_secrets_client
 

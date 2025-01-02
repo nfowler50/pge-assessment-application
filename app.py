@@ -26,25 +26,24 @@ pge_stack = PgeStack(
 
 # Create the lambda hosted stack
 lambda_hosted_stack = LambdaHostedStack(
-    app,
-    "{}-LambdaHostedStack".format(environment), pge_stack=pge_stack
+    app, "{}-LambdaHostedStack".format(environment), pge_stack=pge_stack
 )
 
 # Create the monitoring stack, passing pge_stack as argument to share ARN's
 lambda_monitoring_stack = LambdaMonitoringStack(
-    app, "{}-LambdaMonitoringStack".format(environment), lambda_stack=lambda_hosted_stack
+    app,
+    "{}-LambdaMonitoringStack".format(environment),
+    lambda_stack=lambda_hosted_stack,
 )
 
 # Create the ecs hosted stack
 ecs_hosted_stack = EcsHostedStack(
-    app,
-    "{}-EcsHostedStack".format(environment), pge_stack=pge_stack
+    app, "{}-EcsHostedStack".format(environment), pge_stack=pge_stack
 )
 
 # Create the monitoring stack, passing pge_stack as argument to share ARN's
 ecs_monitoring_stack = EcsMonitoringStack(
-    app, 
-    "{}-EcsMonitoringStack".format(environment), ecs_stack=ecs_hosted_stack
+    app, "{}-EcsMonitoringStack".format(environment), ecs_stack=ecs_hosted_stack
 )
 
 

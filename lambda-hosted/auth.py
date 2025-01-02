@@ -5,8 +5,9 @@ import os
 from jose import jwt, JWTError
 from datetime import timezone
 
+
 class AuthVerifier:
-    def __init__(self, logger = None):
+    def __init__(self, logger=None):
         if logger:
             self.logger = logger
         else:
@@ -21,12 +22,11 @@ class AuthVerifier:
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
 
-
     def get_secret_from_aws(self):
         """Fetch the JWT secret key from AWS Secrets Manager."""
         try:
             response = self.secret_client.get_secret_value(SecretId=self.secret_arn)
-            secret = response.get('SecretString')
+            secret = response.get("SecretString")
             if not secret:
                 raise ValueError("SecretString is missing in the secret response")
             return secret

@@ -6,7 +6,7 @@ from constructs import Construct
 
 
 class LambdaMonitoringStack(Stack):
-    '''
+    """
     LambdaMonitoringStack defines metrics, alarms, and a dashborad for the lambda hosted application.
     Required input on instantiation:
         - lambda_stack -> stack defining resources for lambda hosted application
@@ -25,7 +25,8 @@ class LambdaMonitoringStack(Stack):
         - Metric dashboard used to monitor resources supporting lambda hosted ML inference application
 
     No resources are provided as output.
-    '''
+    """
+
     def __init__(
         self, scope: Construct, construct_id: str, lambda_stack: Construct, **kwargs
     ) -> None:

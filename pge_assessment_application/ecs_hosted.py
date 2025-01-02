@@ -1,15 +1,9 @@
-from aws_cdk import (
-    Stack,
-    aws_ec2,
-    aws_ecs,
-    aws_elasticloadbalancingv2,
-    CfnOutput
-)
+from aws_cdk import Stack, aws_ec2, aws_ecs, aws_elasticloadbalancingv2, CfnOutput
 from constructs import Construct
 
 
 class EcsHostedStack(Stack):
-    '''
+    """
     EcsHostedStack defines resources required for hosting a pretrained ML model in AWS ECS, served through an Application Load Balancer.
     Required input on instantiation:
         - pge_stack -> main stack which hosts shared resources
@@ -31,14 +25,15 @@ class EcsHostedStack(Stack):
     Two resources are provided as output here to be passed to monitoring stack:
         - ecs_serve_service
         - ecs_serve_alb
-    '''
+    """
+
     def __init__(
         self, scope: Construct, construct_id: str, pge_stack: Construct, **kwargs
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # import from main stack
-        s3_model_storage_bucket=pge_stack.s3_model_storage_bucket
+        s3_model_storage_bucket = pge_stack.s3_model_storage_bucket
         secret_api_key = pge_stack.secret_api_key
 
         # Get deployment environment name (SANDBOX / BETA / PROD)
@@ -47,7 +42,7 @@ class EcsHostedStack(Stack):
         if not (environment):
             environment = "SANDBOX"
 
-       #
+        #
         # **** 1. Define resources for ECS hosted service
 
         # Create VPC for ECS served model
@@ -86,9 +81,7 @@ class EcsHostedStack(Stack):
         ecs_serve_container.add_environment(
             "SECRET_API_KEY", secret_api_key.secret_full_arn
         )
-        ecs_serve_container.add_environment(
-            "FLASK_ENV", environment
-        )
+        ecs_serve_container.add_environment("FLASK_ENV", environment)
 
         # From task definition and cluster, create a service leveraging Fargate Spot.
         # Fargate Spot allows us to minimize resource management with serverless functionality,
@@ -149,7 +142,6 @@ class EcsHostedStack(Stack):
         s3_model_storage_bucket.grant_read(ecs_serve_service.task_definition.task_role)
         secret_api_key.grant_read(ecs_serve_service.task_definition.task_role)
 
-        
         # **** 3. Add config details ****
         #
 
